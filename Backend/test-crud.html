@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduLink CRUD Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .btn-danger {
+            background: #dc3545;
+        }
+        .btn-danger:hover {
+            background: #c82333;
+        }
+        .btn-warning {
+            background: #ffc107;
+            color: black;
+        }
+        .btn-warning:hover {
+            background: #e0a800;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f8f9fa;
+        }
+        .status {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .status-active { background: #d4edda; color: #155724; }
+        .status-inactive { background: #fff3cd; color: #856404; }
+        .status-suspended { background: #f8d7da; color: #721c24; }
+        .role {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .role-student { background: #d1ecf1; color: #0c5460; }
+        .role-tutor { background: #d1ecf1; color: #0c5460; }
+        .role-admin { background: #e2e3e5; color: #383d41; }
+        .error {
+            color: red;
+            margin-top: 10px;
+        }
+        .success {
+            color: green;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎓 EduLink - User & Role Management CRUD Test</h1>
+    
+    <!-- Add User Form -->
+    <div class="container">
+        <h2>➕ Add New User</h2>
+        <form id="addUserForm">
+            <div class="form-group">
+                <label for="name">Full Name *</label>
+                <input type="text" id="name" required>
+            </div>
+            <div class="form-group">
+                <label for="email">Email Address *</label>
+                <input type="email" id="email" required>
+            </div>
+            <div class="form-group">
+                <label for="role">Role *</label>
+                <select id="role" required>
+                    <option value="student">Student</option>
+                    <option value="tutor">Tutor</option>
+                    <option value="admin">Admin</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="age">Age *</label>
+                <input type="number" id="age" min="1" max="150" required>
+            </div>
+            <div class="form-group">
+                <label for="status">Status</label>
+                <select id="status">
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                    <option value="suspended">Suspended</option>
+                </select>
+            </div>
+            <button type="submit">Add User</button>
+        </form>
+        <div id="addMessage"></div>
+    </div>
+
+    <!-- Users List -->
+    <div class="container">
+        <h2>👥 Users Management</h2>
+        <button onclick="loadUsers()">🔄 Refresh Users List</button>
+        <div id="usersContainer">
+            <p>Loading users...</p>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:5000/api';
+        
+        // Add User Form Handler
+        document.getElementById('addUserForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = {
+                name: document.getElementById('name').value,
+                email: document.getElementById('email').value,
+                role: document.getElementById('role').value,
+                age: parseInt(document.getElementById('age').value),
+                status: document.getElementById('status').value
+            };
+            
+            try {
+                const response = await fetch(`${API_URL}/users`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                const result = await response.json();
+                const messageDiv = document.getElementById('addMessage');
+                
+                if (response.ok) {
+                    messageDiv.innerHTML = '<div class="success">✅ User added successfully!</div>';
+                    document.getElementById('addUserForm').reset();
+                    loadUsers(); // Refresh the list
+                } else {
+                    messageDiv.innerHTML = `<div class="error">❌ Error: ${result.message}</div>`;
+                }
+            } catch (error) {
+                document.getElementById('addMessage').innerHTML = `<div class="error">❌ Network Error: ${error.message}</div>`;
+            }
+        });
+        
+        // Load Users Function
+        async function loadUsers() {
+            try {
+                const response = await fetch(`${API_URL}/users`);
+                const result = await response.json();
+                const container = document.getElementById('usersContainer');
+                
+                if (response.ok && result.users) {
+                    if (result.users.length === 0) {
+                        container.innerHTML = '<p>No users found. Add some users to get started!</p>';
+                    } else {
+                        container.innerHTML = `
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Email</th>
+                                        <th>Role</th>
+                                        <th>Age</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${result.users.map(user => `
+                                        <tr>
+                                            <td>${user.name}</td>
+                                            <td>${user.email}</td>
+                                            <td><span class="role role-${user.role}">${user.role.toUpperCase()}</span></td>
+                                            <td>${user.age}</td>
+                                            <td><span class="status status-${user.status}">${user.status.toUpperCase()}</span></td>
+                                            <td>
+                                                <button class="btn-warning" onclick="editUser('${user._id}')">✏️ Edit</button>
+                                                <button class="btn-danger" onclick="deleteUser('${user._id}', '${user.name}')">🗑️ Delete</button>
+                                            </td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        `;
+                    }
+                } else {
+                    container.innerHTML = `<div class="error">❌ Error loading users: ${result.message || 'Unknown error'}</div>`;
+                }
+            } catch (error) {
+                document.getElementById('usersContainer').innerHTML = `<div class="error">❌ Network Error: ${error.message}<br><br>🔧 <strong>Troubleshooting:</strong><br>1. Make sure the backend server is running on http://localhost:5000<br>2. Check if the database is connected<br>3. Verify the API routes are working</div>`;
+            }
+        }
+        
+        // Delete User Function
+        async function deleteUser(userId, userName) {
+            if (!confirm(`Are you sure you want to delete user "${userName}"?`)) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_URL}/users/${userId}`, {
+                    method: 'DELETE'
+                });
+                
+                if (response.ok) {
+                    alert('✅ User deleted successfully!');
+                    loadUsers();
+                } else {
+                    const result = await response.json();
+                    alert(`❌ Error deleting user: ${result.message}`);
+                }
+            } catch (error) {
+                alert(`❌ Network Error: ${error.message}`);
+            }
+        }
+        
+        // Edit User Function (simplified)
+        function editUser(userId) {
+            alert(`Edit functionality would open for user ID: ${userId}\n\nFor now, this is a placeholder. The full React app has inline editing capability.`);
+        }
+        
+        // Load users when page loads
+        window.addEventListener('load', loadUsers);
+    </script>
+</body>
+</html>

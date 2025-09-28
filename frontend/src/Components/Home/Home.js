@@ -1,10 +1,13 @@
 import React from 'react'
+import { Link } from 'react-router-dom';
 import Nav from "../Nav/Nav";
 
 function Home() {
   return (
     <div className="min-h-screen">
       <Nav />
+      
+  {/* Role Test Panel removed from homepage. Only available in sign-in page. */}
       
       {/* Hero Section */}
       <section className="bg-gradient-to-br from-blue-600 via-purple-700 to-indigo-800 text-white">
@@ -18,21 +21,14 @@ function Home() {
               Connect, learn, and grow with cutting-edge educational technology.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button className="bg-yellow-400 text-gray-900 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-yellow-300 transition-all duration-300 transform hover:scale-105 shadow-lg">
+              <Link to="/onboarding" className="bg-yellow-400 text-gray-900 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-yellow-300 transition-all duration-300 transform hover:scale-105 shadow-lg text-center">
                 Get Started
-              </button>
-              <button className="border-2 border-white text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-white hover:text-gray-900 transition-all duration-300">
+              </Link>
+              <Link to="/help" className="border-2 border-white text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-white hover:text-gray-900 transition-all duration-300 text-center">
                 Learn More
-              </button>
+              </Link>
             </div>
           </div>
-        </div>
-        
-        {/* Wave decoration */}
-        <div className="relative">
-          <svg className="w-full h-16 text-gray-50" viewBox="0 0 1200 120" fill="currentColor">
-            <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z"></path>
-          </svg>
         </div>
       </section>
 
@@ -119,7 +115,7 @@ function Home() {
             Start your journey today!
           </p>
           <button className="bg-white text-indigo-600 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-gray-100 transition-all duration-300 transform hover:scale-105 shadow-lg">
-            Enroll Now
+            <Link to="/signin" className="block w-full h-full">Enroll Now</Link>
           </button>
         </div>
       </section>
